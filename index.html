@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 
-<link rel="icon" type="image/png" href="favicon.png">
-
-<!-- ★ ブラウザズーム完全禁止 -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>イシダテックパンフレット</title>
+<title>イシダテック -パンフレット</title>
+
+<link rel="icon" href="favicon.png" type="image/png">
 
 <style>
   body {
@@ -16,22 +15,53 @@
     font-family: sans-serif;
     text-align: center;
     overflow: hidden;
-    touch-action: none; /* ★ 暗黙ズーム防止 */
+    touch-action: none;
   }
 
-  h2 { margin: 8px 0; }
+  .top-logo {
+    margin-top: 17px;
+    margin-bottom: 14px;
+  }
 
-  .controls { margin: 8px 0; }
+  .top-logo img {
+    height: 60px;
+  }
+
+  h2 {
+    font-size: 18px;
+    margin: 4px 0 8px;
+  }
+
+  .controls {
+    margin: 8px 0;
+  }
 
   button {
     padding: 8px 16px;
     font-size: 16px;
     margin: 0 10px;
+    background: #22b14c;
+    color: #fff;
+    border: 2px solid #22b14c;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+  }
+
+  button:hover {
+    background: #ffffff;
+    color: #22b14c;
+  }
+
+  button:active {
+    background: #1a8f3d;
+    color: #ffffff;
+    transform: translateY(1px);
   }
 
   .stage {
     width: 100vw;
-    height: calc(100vh - 120px);
+    height: calc(100vh - 160px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -50,7 +80,9 @@
     user-select: none;
   }
 
-  .viewer:active { cursor: grabbing; }
+  .viewer:active {
+    cursor: grabbing;
+  }
 
   .viewer img {
     display: block;
@@ -63,11 +95,13 @@
 </head>
 <body>
 
-<h2>イシダテックパンフレット</h2>
+<div class="top-logo">
+  <img src="logo.png" alt="イシダテック ロゴ">
+</div>
 
 <div class="controls">
-  <button onclick="prev()">◀ 戻る</button>
-  <button onclick="next()">進む ▶</button>
+  <button id="prevBtn" onclick="prev()">◀ 戻る</button>
+  <button id="nextBtn" onclick="next()">進む ▶</button>
 </div>
 
 <div class="stage">
@@ -91,12 +125,18 @@
 
   const viewer = document.getElementById('viewer');
   const scaleWrapper = document.getElementById('scaleWrapper');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
 
   function render() {
     viewer.innerHTML = '';
     viewer.className = 'viewer';
     offsetX = 0;
     viewer.style.transform = 'translateX(0px)';
+
+    // ボタン表示制御
+    prevBtn.style.display = index === 0 ? 'none' : 'inline-block';
+    nextBtn.style.display = index === sequence.length - 1 ? 'none' : 'inline-block';
 
     const pages = sequence[index];
     if (pages.length === 1) viewer.classList.add('border');
@@ -110,7 +150,7 @@
       img.onload = () => {
         loaded++;
         if (loaded === pages.length) {
-          fitToScreen(); // ★ 全画像読込後に一度だけ実行
+          fitToScreen();
         }
       };
 
@@ -128,13 +168,11 @@
     const viewerH = viewer.scrollHeight;
 
     let scale = Math.min(stageW / viewerW, stageH / viewerH);
-
-    if (scale > 1) scale = 1; // ★ 拡大禁止
+    if (scale > 1) scale = 1;
 
     scaleWrapper.style.transform = `scale(${scale})`;
   }
 
-  /* ドラッグ */
   viewer.addEventListener('mousedown', e => {
     dragging = true;
     startX = e.clientX - offsetX;
@@ -148,7 +186,6 @@
 
   window.addEventListener('mouseup', () => dragging = false);
 
-  /* タッチ */
   viewer.addEventListener('touchstart', e => {
     dragging = true;
     startX = e.touches[0].clientX - offsetX;
